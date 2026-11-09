@@ -5798,3 +5798,5 @@ main#conteudo .about-lead-mark.about-lead-logo img{
 @media(prefers-reduced-motion:reduce){
  .mobile-bottom-nav.mobile-bottom-nav--apee{transition:none!important}
 }
+
+@media(min-width:761px){.apee-section-jumps-wrap{display:none!important}}
