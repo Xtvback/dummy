@@ -43,7 +43,7 @@ const style=el('style');style.textContent=`
 .apee-assistente-input{min-width:0;flex:1;border:1px solid #b8cfe9;border-radius:12px;padding:10px;font:14px "DM Sans",system-ui;color:#173858}
 .apee-assistente-send{background:#155ba9;color:#fff;border:0;border-radius:12px;padding:8px 13px;font-weight:750;cursor:pointer}
 .apee-assistente-foot{font-size:10px;padding:0 13px 11px;color:#5c6f82;background:#fff}
-@media(max-width:760px){#apee-assistente-abrir{bottom:calc(82px + env(safe-area-inset-bottom));right:12px;padding:11px 13px;font-size:12px}.apee-assistente{right:8px;bottom:calc(137px + env(safe-area-inset-bottom));width:calc(100vw - 16px);max-height:calc(100dvh - 150px);border-radius:16px}}
+@media(max-width:760px){#apee-assistente-abrir{bottom:calc(102px + env(safe-area-inset-bottom));right:12px;padding:11px 13px;font-size:12px}.apee-assistente{right:8px;bottom:calc(157px + env(safe-area-inset-bottom));width:calc(100vw - 16px);max-height:calc(100dvh - 170px);border-radius:16px}}
 @media(max-width:375px){#apee-assistente-abrir{padding:9px 11px}}
 @media(prefers-reduced-motion:reduce){.apee-assistente *{scroll-behavior:auto!important}}
 `;document.head.appendChild(style);
