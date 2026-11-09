@@ -321,17 +321,3 @@ if(b&&m){
  };
  input.addEventListener('input',filter);
 })();
-
-/* TESTE MOBILE APEE: barra discreta enquanto se percorre a página. */
-(function(){
-  let last=window.scrollY,locked=false;
-  const tick=()=>{
-    locked=false;
-    if(!matchMedia('(max-width:760px)').matches){document.body.classList.remove('apee-nav-compact');return}
-    const y=window.scrollY;
-    if(y<130||y<last-8)document.body.classList.remove('apee-nav-compact');
-    else if(y>last+10&&y>260)document.body.classList.add('apee-nav-compact');
-    last=y;
-  };
-  window.addEventListener('scroll',()=>{if(!locked){locked=true;requestAnimationFrame(tick)}},{passive:true});
-})();
