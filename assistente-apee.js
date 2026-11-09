@@ -51,22 +51,45 @@ const open=el('button');open.id='apee-assistente-abrir';open.type='button';open.
 const panel=el('section','apee-assistente');panel.setAttribute('role','dialog');panel.setAttribute('aria-label','Assistente virtual APEE');panel.setAttribute('aria-modal','false');panel.dataset.open='false';
 const header=el('div','apee-assistente-head'),logo=el('span','apee-assistente-logo'),titles=el('div','apee-assistente-head-text');
 const logoImg=el('img');logoImg.src='/dummy/_external/d2ol7oe51mr4n9.cloudfront.net/user_3EbWYhy0t8ty8Wz9RPVrhpDHVlB/6c0a90e1-f63f-4e2c-8a73-48d8610f6db5.jpg';logoImg.alt='Logótipo oficial da APEE Bairro do Restelo';logoImg.style.cssText='width:100%;height:100%;object-fit:contain;border-radius:50%;display:block';logo.append(logoImg);
-titles.innerHTML='<strong>Assistente APEE</strong><small>Informações para as famílias</small>';
+titles.innerHTML='<strong>Assistente APEE</strong><small>Perguntas sobre a escola · IA experimental</small>';
 const close=el('button','apee-assistente-close','×');close.type='button';close.setAttribute('aria-label','Fechar chat');
 header.append(logo,titles,close);
 const body=el('div','apee-assistente-body');body.setAttribute('aria-live','polite');body.setAttribute('aria-relevant','additions');
 const form=el('form','apee-assistente-form'),input=el('input','apee-assistente-input');input.type='text';input.maxLength=220;input.placeholder='Escreve a tua pergunta...';input.setAttribute('aria-label','Pergunta ao Assistente APEE');input.autocomplete='off';
 const send=el('button','apee-assistente-send','Enviar');send.type='submit';form.append(input,send);
-const foot=el('div','apee-assistente-foot','Respostas automáticas, não oficiais. Não escrevas dados pessoais ou de crianças.');panel.append(header,body,form,foot);document.body.append(panel,open);
+const foot=el('div','apee-assistente-foot','IA experimental: pode cometer erros. Não escrevas dados pessoais ou de crianças.');panel.append(header,body,form,foot);document.body.append(panel,open);
 let greeted=false;
 function message(text,who='bot'){const m=el('div','apee-assistente-bubble '+(who==='user'?'apee-assistente-user':'apee-assistente-bot'),text);body.appendChild(m);body.scrollTop=body.scrollHeight;return m}
 function link(href,label){const wrap=el('div','apee-assistente-links'),a=el('a','',label+' →');a.href=base+href;wrap.append(a);body.append(wrap);body.scrollTop=body.scrollHeight}
-function ask(q){const text=String(q||'').trim().slice(0,220);if(!text)return;message(text,'user');const n=norm(text);
+async function ask(q){
+ const text=String(q||'').trim().slice(0,220);if(!text)return;
+ message(text,'user');
+ const n=norm(text);
  let best=null,score=0;
- for(const item of knowledge){let s=0;for(const k of item.keys){const term=norm(k);if(n.includes(term))s+=term.includes(' ')?4:term.length>5?3:2}if(s>score){score=s;best=item}}
- if(score>0&&best){message(best.answer);link(best.link,best.label)}
- else{message('Ainda não tenho uma resposta segura para essa questão. Podes consultar os contactos oficiais da APEE para obter esclarecimentos. Não partilhes aqui dados pessoais.');link('contactos.html','Contactar a APEE')}
+ for(const item of knowledge){let v=0;for(const k of item.keys){const term=norm(k);if(n.includes(term))v+=term.includes(' ')?4:term.length>5?3:2}if(v>score){score=v;best=item}}
+ if(/\b[\w.+-]+@[\w.-]+\.[a-z]{2,}\b/i.test(text)||/\b\d{9,}\b/.test(text)||/\b(?:nif|morada|palavra.passe|numero de processo|processo individual)\b/i.test(n)){
+   message('Por proteção dos dados pessoais, utiliza os contactos oficiais da APEE para esta questão.');
+   link('contactos.html','Contactar a APEE');return;
  }
+ const thinking=message('A consultar a informação da APEE…');
+ try{
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),18000);
+  let res;
+  try{res=await fetch('https://apee-assistente-demo-ai.xtvback2.workers.dev/api/chat',{
+     method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:text}),signal:controller.signal
+  })}finally{clearTimeout(timeout)}
+  const data=await res.json();
+  if(res.ok&&data.ok&&typeof data.answer==='string'&&data.answer.trim()){
+   thinking.textContent=data.answer.trim();
+   if(score>0&&best)link(best.link,best.label);
+   return;
+  }
+ }catch(e){}
+ thinking.remove();
+ if(score>0&&best){message('Resposta automática: '+best.answer);link(best.link,best.label)}
+ else{message('Não tenho informação confirmada sobre essa questão. Consulta os contactos oficiais da APEE.');link('contactos.html','Contactar a APEE')}
+}
 function toggle(v){panel.dataset.open=String(v);open.setAttribute('aria-expanded',String(v));if(v){if(!greeted){greeted=true;message('Olá! 👋 Sou o Assistente Virtual da APEE Bairro do Restelo. Posso ajudar a encontrar informações no site.');const choices=el('div','apee-assistente-choices');prompts.forEach(q=>{const b=el('button','apee-assistente-question',q);b.type='button';b.addEventListener('click',()=>ask(q));choices.append(b)});body.append(choices)}input.focus()}else open.focus()}
 open.addEventListener('click',()=>toggle(panel.dataset.open!=='true'));close.addEventListener('click',()=>toggle(false));document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.dataset.open==='true')toggle(false)});
 form.addEventListener('submit',e=>{e.preventDefault();e.stopImmediatePropagation();const q=input.value;input.value='';ask(q)},true);
