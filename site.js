@@ -38,9 +38,9 @@ if(b&&m){
       icon:'<path d="M15 19a6 6 0 0 0-12 0v2h12v-2Z"/><circle cx="9" cy="8" r="4"/><path d="M19 8v8m-4-4h8"/>'},
     {href:whatsapp,text:'Comunidade',label:'Aderir à comunidade WhatsApp da APEE',tone:'green',external:true,
       icon:'<path d="M20 11.5a8.5 8.5 0 0 1-12.5 7.5L3 20l1.2-4.4a8.5 8.5 0 1 1 15.8-4.1Z"/><path d="M9 9.1c.6 2.2 2.1 3.7 4.3 4.3l1.7-1.3"/>'},
-    {href:'/contactos.html',text:'Contactos',label:'Contactos da APEE',tone:'red',active:path.endsWith('/contactos.html'),
+    {href:'/dummy/contactos.html',text:'Contactos',label:'Contactos da APEE',tone:'red',active:path.endsWith('/contactos.html'),
       icon:'<rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="m3.5 7 8.5 6 8.5-6"/>'},
-    {href:'/agenda.html',text:'Agenda',label:'Agenda da APEE',tone:'yellow',active:path.endsWith('/agenda.html'),
+    {href:'/dummy/agenda.html',text:'Agenda',label:'Agenda da APEE',tone:'yellow',active:path.endsWith('/agenda.html'),
       icon:'<rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M7 3v4m10-4v4M3 10h18m-12 5h5"/>'}
   ];
   if(document.querySelector('.mobile-bottom-nav'))return;
@@ -79,7 +79,7 @@ if(b&&m){
   const before=nav.querySelector('a[href="/contactos.html"]');nav.insertBefore(a,before);
  }
  const footer=document.querySelector('.foot-links');
- if(footer){for(const link of [{href:'/inscricao.html',text:'Inscrição de Associados'},{href:'/privacidade.html',text:'Privacidade'}]){
+ if(footer){for(const link of [{href:'/dummy/inscricao.html',text:'Inscrição de Associados'},{href:'/dummy/privacidade.html',text:'Privacidade'}]){
   if(!footer.querySelector('a[href="'+link.href+'"]')){const a=document.createElement('a');a.href=link.href;a.textContent=link.text;footer.appendChild(a)}
  }}
 })();
@@ -128,7 +128,7 @@ if(b&&m){
 (function(){
  const links=document.querySelector('.foot-links');
  if(links){
-  for(const item of [{href:'/familias.html#guia',label:'Guia das Famílias'},{href:'/historia-escola.html',label:'História da escola'},{href:'/arquivo-historico.html',label:'Arquivo de mandatos anteriores'}]){
+  for(const item of [{href:'/dummy/familias.html#guia',label:'Guia das Famílias'},{href:'/dummy/historia-escola.html',label:'História da escola'},{href:'/dummy/arquivo-historico.html',label:'Arquivo de mandatos anteriores'}]){
    if(!links.querySelector('a[href="'+item.href+'"]')){
     const a=document.createElement('a');a.href=item.href;a.textContent=item.label;links.appendChild(a);
    }
@@ -320,4 +320,18 @@ if(b&&m){
   empty.hidden=visibleCount!==0;
  };
  input.addEventListener('input',filter);
+})();
+
+/* TESTE MOBILE APEE: barra discreta enquanto se percorre a página. */
+(function(){
+  let last=window.scrollY,locked=false;
+  const tick=()=>{
+    locked=false;
+    if(!matchMedia('(max-width:760px)').matches){document.body.classList.remove('apee-nav-compact');return}
+    const y=window.scrollY;
+    if(y<130||y<last-8)document.body.classList.remove('apee-nav-compact');
+    else if(y>last+10&&y>260)document.body.classList.add('apee-nav-compact');
+    last=y;
+  };
+  window.addEventListener('scroll',()=>{if(!locked){locked=true;requestAnimationFrame(tick)}},{passive:true});
 })();
